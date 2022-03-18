@@ -13,7 +13,16 @@
 					<DownloadOutlined v-if="node.type === 'input'" />
 					<UploadOutlined v-else-if="node.type === 'output'" />
 					<ForkOutlined v-else-if="node.type === 'joinGateway'" />
-					<BranchesOutlined v-else-if="node.type === 'forkGateway'" />
+					<ForkOutlined
+						style="
+							transform: rotate(180deg);
+							-webkit-transform: rotate(180deg);
+						"
+						v-else-if="node.type === 'forkGateway'"
+					/>
+					<BranchesOutlined
+						v-else-if="node.type === 'exclusiveGateway'"
+					/>
 					<DatabaseOutlined v-else-if="node.type === 'database'" />
 					<SendOutlined v-else-if="node.type === 'message'" />
 					<FunctionOutlined v-else /> </span
@@ -88,6 +97,7 @@ import {
 	SendOutlined,
 	PlusOutlined,
 } from "@ant-design/icons-vue";
+
 export default {
 	components: {
 		ForkOutlined,
@@ -144,7 +154,9 @@ export default {
 	methods: {
 		// 点击节点
 		clickNode() {
-			this.$emit("clickNode", this.node);
+			if (this.node.type.indexOf("Gateway") < 0) {
+				this.$emit("clickNode", this.node);
+			}
 		},
 		addForkChild() {
 			this.$emit("addForkNode", this.node);
@@ -170,9 +182,9 @@ export default {
 			}
 			this.$confirm({
 				title: "是否删除该节点",
+				content: "再次确认是否要删除",
 				okText: "删除",
 				cancelText: "取消",
-				dialogStyle: { top: this.node.top, left: this.node.left },
 				onOk: () => {
 					this.$emit("deleteNode", this.node.id);
 				},
@@ -208,6 +220,7 @@ export default {
 	width: 220px;
 	border-radius: 5px;
 }
+.node-exclusiveGateway,
 .node-forkGateway,
 .node-joinGateway {
 	height: 40px;
@@ -250,6 +263,7 @@ export default {
 	color: #000000d9;
 	font-weight: 500;
 	font-size: 16px;
+	user-select: none;
 }
 
 .node-input .node-box-title,
@@ -289,13 +303,5 @@ export default {
 	color: #e0e3e7;
 	background: #1879ffde;
 	border-radius: 5px;
-}
-.jtk-overlay.flow-edge-label {
-	padding: 4px 10px;
-	background-color: white;
-	color: #565758 !important;
-	border: 1px solid #e0e3e7;
-	border-radius: 5px;
-	z-index: 1000;
 }
 </style>

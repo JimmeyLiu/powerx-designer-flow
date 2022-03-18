@@ -26,11 +26,18 @@
 							<UploadOutlined
 								v-else-if="item.type === 'output'"
 							/>
+							<BranchesOutlined
+								v-else-if="item.type === 'exclusiveGateway'"
+							/>
+							<ForkOutlined
+								style="
+									transform: rotate(180deg);
+									-webkit-transform: rotate(180deg);
+								"
+								v-else-if="item.type === 'forkGateway'"
+							/>
 							<ForkOutlined
 								v-else-if="item.type === 'joinGateway'"
-							/>
-							<BranchesOutlined
-								v-else-if="item.type === 'forkGateway'"
 							/>
 							<DatabaseOutlined
 								v-else-if="item.type === 'database'"

@@ -3,7 +3,7 @@
 export const jsplumbOptions = {
   methods: {
     getSourceOptions(type) {
-      return "forkGateway" === type
+      return "exclusiveGateway" === type || "forkGateway" === type
         ? this.forkSourceOptions
         : this.sourceOptions;
     },

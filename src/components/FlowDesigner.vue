@@ -15,37 +15,61 @@
 			<main-panel
 				ref="mainPanel"
 				@clickNode="setNodeProperties"
-				@clickConditionEdge="setNodeProperties"
+				@clickConditionEdge="setEdgeProperties"
 				:flowData="flowData"
 			/>
 		</a-layout-content>
 	</a-layout>
 
 	<a-drawer
-		:title="node.name"
 		placement="right"
-		width="720px"
+		width="500px"
 		:maskStyle="{ backgroundColor: '#00000000' }"
-		:visible="showPropertiesPanel"
-		@close="closePropertiesPanel"
+		:visible="showSetterPanel"
+		@close="closeSetterPanel"
 	>
-		{{ node.name }}
+		<template #title>
+			<span v-if="type === 'edge'">编辑条件 </span>
+			<span v-else-if="data">{{ data.name }}</span>
+		</template>
+		<setter-panel ref="setterPanel" :type="type" :data="data" />
+		<div
+			:style="{
+				position: 'absolute',
+				left: 0,
+				bottom: 0,
+				width: '100%',
+				borderTop: '1px solid #e9e9e9',
+				padding: '10px 16px',
+				background: '#fff',
+				textAlign: 'left',
+				zIndex: 1,
+			}"
+		>
+			<a-button
+				type="primary"
+				style="margin-right: 8px"
+				@click="saveSetter"
+				>保存</a-button
+			>
+			<a-button @click="closeSetterPanel">取消</a-button>
+		</div>
 	</a-drawer>
 </template>
 <script>
 import { defineComponent, ref } from "vue";
 import MainPanel from "./panel/MainPanel.vue";
 import NodePanel from "./panel/NodePanel.vue";
-// import PropertiesPanel from "./panel/PropertiesPanel.vue";
+import SetterPanel from "./panel/SetterPanel.vue";
 
-// import keymaster from "keymaster";
 export default defineComponent({
-	components: { MainPanel, NodePanel },
+	components: { MainPanel, NodePanel, SetterPanel },
 	props: ["flowData"],
 	setup() {
 		return {
-			showPropertiesPanel: ref(false),
-			node: ref({}),
+			showSetterPanel: ref(false),
+			type: ref({}),
+			data: ref({}),
 		};
 	},
 	mounted() {
@@ -53,12 +77,17 @@ export default defineComponent({
 	},
 	methods: {
 		setNodeProperties(node) {
-			console.log("set " + node);
-			this.node = node;
-			this.showPropertiesPanel = true;
+			this.data = node;
+			this.type = "node";
+			this.showSetterPanel = true;
 		},
-		closePropertiesPanel() {
-			this.showPropertiesPanel = false;
+		setEdgeProperties(conn) {
+			this.data = conn;
+			this.type = "edge";
+			this.showSetterPanel = true;
+		},
+		closeSetterPanel() {
+			this.showSetterPanel = false;
 		},
 		addNode(event, nodeType) {
 			this.$refs.mainPanel.addNode(event, nodeType);
@@ -68,6 +97,15 @@ export default defineComponent({
 		},
 		getFlowData() {
 			return this.$refs.mainPanel.getFlowData();
+		},
+		saveSetter() {
+			let data = this.$refs.setterPanel.getSetterData();
+			if (this.type === "edge") {
+				this.$refs.mainPanel.updateEdge(data);
+			} else {
+				this.$refs.mainPanel.updateNode(data);
+			}
+			this.closeSetterPanel();
 		},
 	},
 });

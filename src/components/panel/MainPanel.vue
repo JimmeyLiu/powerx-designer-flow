@@ -119,6 +119,13 @@ export default defineComponent({
 			});
 			return map;
 		},
+		edgeMap() {
+			let map = {};
+			this.data.edges.forEach((it) => {
+				map[it.source + "-" + it.target] = it;
+			});
+			return map;
+		},
 	},
 	mounted() {
 		this.data = this.flowData;
@@ -142,17 +149,29 @@ export default defineComponent({
 				// 初始化节点
 				this.loadFlow();
 				// 单点击了连接线, https://www.cnblogs.com/ysx215/p/7615677.html
-				this.jsPlumb.bind("click", (conn) => {
-					console.log(conn);
-				});
+				// this.jsPlumb.bind("click", (conn) => {
+				// 	console.log(conn);
+				// });
 				this.jsPlumb.bind("dblclick", (conn, e) => {
-					this.insertPlaceholder(conn, e);
+					let source = this.nodeMap[conn.sourceId];
+					if (
+						source &&
+						(source.type === "exclusiveGateway" ||
+							source.type === "forkGateway")
+					) {
+						this.$emit(
+							"clickConditionEdge",
+							this.edgeMap[conn.sourceId + "-" + conn.targetId]
+						);
+					} else {
+						this.insertPlaceholder(conn, e);
+					}
 				});
 				// 连线
 				this.jsPlumb.bind("connection", (evt) => {
 					let from = evt.source.id;
 					let to = evt.target.id;
-					this.data.edges.push({ from: from, to: to });
+					this.data.edges.push({ source: from, target: to });
 				});
 
 				// 删除连线回调
@@ -222,12 +241,6 @@ export default defineComponent({
 			this.jsPlumb.draggable(node.id, {
 				grid: [10, 10],
 				containment: "parent",
-				start: function (evt) {
-					console.log("start move " + evt.el.id);
-				},
-				stop: function (evt) {
-					console.log("end move " + evt.el.id);
-				},
 			});
 		},
 
@@ -240,9 +253,9 @@ export default defineComponent({
 			for (let i = 0; i < this.data.edges.length; i++) {
 				let line = this.data.edges[i];
 				var connParam = {
-					source: line.from,
-					target: line.to,
-					label: line.label ? line.label : "",
+					source: line.source,
+					target: line.target,
+					label: line.name ? line.name : "",
 					connector: line.connector ? line.connector : "",
 					anchors: line.anchors ? line.anchors : undefined,
 					paintStyle: line.paintStyle ? line.paintStyle : undefined,
@@ -361,10 +374,10 @@ export default defineComponent({
 			let source, target;
 			for (let i = 0; i < this.data.edges.length; i++) {
 				let edge = this.data.edges[i];
-				if (edge.from === id) {
-					target = edge.to;
-				} else if (edge.to === id) {
-					source = edge.from;
+				if (edge.source === id) {
+					target = edge.target;
+				} else if (edge.target === id) {
+					source = edge.source;
 				} else {
 					edges.push(edge);
 				}
@@ -384,6 +397,40 @@ export default defineComponent({
 
 		deleteEdge() {
 			console.log("delete edge");
+		},
+
+		updateEdge(edge) {
+			console.log("update edge " + JSON.stringify(edge));
+			let old;
+			this.data.edges.forEach((it) => {
+				if (it.source !== edge.source || it.target !== edge.target) {
+					return;
+				}
+				old = lodash.cloneDeep(it);
+				it = lodash.merge(it, edge);
+			});
+			if (old && old.name !== edge.name) {
+				console.log("update label");
+				//update label
+				this.$nextTick(function () {
+					this.jsPlumb.getAllConnections().forEach((conn) => {
+						if (
+							conn.sourceId === edge.source &&
+							conn.targetId === edge.target
+						) {
+							conn.setLabel(edge.name);
+						}
+					});
+				});
+			}
+		},
+		updateNode(node) {
+			this.data.nodes.forEach((it) => {
+				if (it.id !== node.id) {
+					return;
+				}
+				it = lodash.merge(it, node);
+			});
 		},
 
 		unlockNode(id) {
@@ -412,9 +459,15 @@ export default defineComponent({
 		},
 		getFlowData() {
 			let data = lodash.cloneDeep(this.data);
+
+			let edgeMap = {};
+			data.edges.forEach((it) => {
+				edgeMap[it.source + "-" + it.target] = it;
+			});
 			let edges = [];
 			this.jsPlumb.getAllConnections().forEach((conn) => {
-				edges.push({ from: conn.sourceId, to: conn.targetId });
+				let edge = edgeMap[conn.sourceId + "-" + conn.targetId];
+				edges.push(edge);
 			});
 
 			//获取实际位置来覆盖，这个最准确
@@ -492,7 +545,7 @@ export default defineComponent({
 	},
 });
 </script>
-<style scoped>
+<style>
 #flow-container {
 	background: url(https://img.alicdn.com/imgextra/i3/O1CN01LVUi4y1e6WRzwnhIh_!!6000000003822-55-tps-22-22.svg)
 		0 0 repeat;
@@ -513,5 +566,15 @@ export default defineComponent({
 }
 .container-toolbar-item:hover {
 	cursor: pointer;
+}
+
+.flow-edge-label {
+	padding: 4px 10px;
+	background-color: white;
+	color: #565758 !important;
+	border: 1px solid #e0e3e7;
+	border-radius: 5px;
+	z-index: 1000;
+	user-select: none;
 }
 </style>

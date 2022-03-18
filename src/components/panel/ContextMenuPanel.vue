@@ -21,7 +21,8 @@
 						>
 						<a-button
 							class="btn-item"
-							type="danger"
+                            type="primary"
+                            danger
 							@click="deleteEdge"
 							><template #icon> <DeleteOutlined /> </template
 							>删除连线</a-button

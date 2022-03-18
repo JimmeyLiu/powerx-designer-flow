@@ -100,17 +100,17 @@ export const jsplumbSetting = {
             },
           ],
         ],
-        // ConnectionOverlays: [
-        //   [
-        //     "Label",
-        //     {
-        //       location: 0.8,
-        //       cssClass: "aLabel",
-        //     },
-        //   ],
-        // ],
+        ConnectionOverlays: [
+          [
+            "Label",
+            {
+              location: 0.8,
+              cssClass: "aLabel",
+            },
+          ],
+        ],
         // 绘制图的模式 svg、canvas
-        RenderMode: "svg",
+        RenderMode: "canvas",
         // 鼠标滑过线的样式
         HoverPaintStyle: { stroke: "#b0b2b5", strokeWidth: 1 },
         // 滑过锚点效果
