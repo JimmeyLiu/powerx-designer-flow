@@ -6,7 +6,6 @@
 			style="height: 48px; line-height: 48px; background: #fff"
 		>
 			<div>
-				<img width="32" src="@/assets/logo.png" />
 				<a-button type="primary" @click="saveData">保存</a-button>
 			</div>
 		</a-layout-header>
