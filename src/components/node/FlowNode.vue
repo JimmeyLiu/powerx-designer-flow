@@ -8,7 +8,7 @@
 		size="small"
 	>
 		<div class="node-box" v-if="node.type !== 'placeholder'">
-			<div class="node-box-title">
+			<div :class="titleClass">
 				<span class="node-box-icon">
 					<DownloadOutlined v-if="node.type === 'input'" />
 					<UploadOutlined v-else-if="node.type === 'output'" />
@@ -61,19 +61,12 @@
 				@click="deleteNode"
 				><DeleteOutlined
 			/></span>
-			<span
-				class="node-toolbar-item"
-				v-if="
-					node.type !== 'placeholder' &&
-					node.type !== 'forkGateway' &&
-					node.type !== 'joinGateway'
-				"
-				@click="clickNode"
+			<span class="node-toolbar-item" v-if="editAble" @click="clickNode"
 				><EditOutlined />
 			</span>
 			<span
 				class="node-toolbar-item"
-				v-if="node.type === 'forkGateway'"
+				v-if="plusAble"
 				@click="addForkChild"
 				><PlusOutlined />
 			</span>
@@ -97,7 +90,7 @@ import {
 	SendOutlined,
 	PlusOutlined,
 } from "@ant-design/icons-vue";
-
+import { nodeConfig } from "../core/nodes";
 export default {
 	components: {
 		ForkOutlined,
@@ -132,29 +125,34 @@ export default {
 			return this.node.isAdd ? !this.locked : this.locked;
 		},
 		lockAble() {
-			return this.node.type !== "input" && this.node.type !== "output";
+			return nodeConfig[this.node.type].lockAble;
+		},
+		editAble() {
+			return nodeConfig[this.node.type].editAble;
 		},
 		deleteAble() {
-			return this.node.type !== "input";
+			return nodeConfig[this.node.type].deleteAble;
+		},
+		plusAble() {
+			return nodeConfig[this.node.type].plusAble;
 		},
 		nodeContainerClass() {
 			return ["node-container", "node-" + this.node.type];
 		},
-		// 节点容器样式
-
-		nodeIcoClass() {
-			var nodeIcoClass = {};
-			nodeIcoClass[this.node.ico] = true;
-			// 添加该class可以推拽连线出来，viewOnly 可以控制节点是否运行编辑
-			nodeIcoClass["flow-node-drag"] = this.node.viewOnly ? false : true;
-			return nodeIcoClass;
+		titleClass() {
+			return nodeConfig[this.node.type].titleCenter
+				? ["node-box-title", "node-box-title-center"]
+				: ["node-box-title", "node-box-title-left"];
 		},
 	},
 	emits: ["clickNode", "addForkNode"],
 	methods: {
 		// 点击节点
 		clickNode() {
-			if (this.node.type.indexOf("Gateway") < 0) {
+			if (
+				this.node.type.indexOf("Gateway") < 0 &&
+				this.node.type !== "placeholder"
+			) {
 				this.$emit("clickNode", this.node);
 			}
 		},
@@ -254,7 +252,6 @@ export default {
 	padding-right: 4px;
 }
 .node-box-title {
-	display: inline-block;
 	flex: 1;
 	padding: 6px;
 	overflow: hidden;
@@ -264,6 +261,14 @@ export default {
 	font-weight: 500;
 	font-size: 16px;
 	user-select: none;
+}
+.node-box-title-left {
+	display: inline-block;
+}
+.node-box-title-center {
+	display: flex;
+	justify-content: center;
+	text-align: center;
 }
 
 .node-input .node-box-title,

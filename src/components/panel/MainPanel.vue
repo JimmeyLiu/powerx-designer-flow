@@ -211,9 +211,9 @@ export default defineComponent({
 				});
 
 				// beforeDetach
-				this.jsPlumb.bind("beforeDetach", (evt) => {
-					console.log("beforeDetach", evt);
-				});
+				// this.jsPlumb.bind("beforeDetach", (evt) => {
+				// 	console.log("beforeDetach", evt);
+				// });
 				this.jsPlumb.setContainer(this.$refs.flowContainer);
 			});
 		},

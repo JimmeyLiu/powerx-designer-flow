@@ -25,3 +25,68 @@ export const nodes = [
     type: "output",
   },
 ];
+
+export const nodeConfig = {
+  input: {
+    lockAble: false,
+    editAble: true,
+    deleteAble: false,
+    plusAble: true,
+    titleCenter: true,
+  },
+  output: {
+    lockAble: true,
+    editAble: true,
+    deleteAble: true,
+    plusAble: false,
+    titleCenter: true,
+  },
+  placeholder: {
+    lockAble: false,
+    editAble: false,
+    deleteAble: true,
+    plusAble: false,
+  },
+  exclusiveGateway: {
+    lockAble: true,
+    editAble: false,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: true,
+  },
+  joinGateway: {
+    lockAble: true,
+    editAble: false,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: true,
+  },
+  forkGateway: {
+    lockAble: true,
+    editAble: false,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: true,
+  },
+  service: {
+    lockAble: true,
+    editAble: true,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: false,
+  },
+  database: {
+    lockAble: true,
+    editAble: true,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: false,
+  },
+  message: {
+    lockAble: true,
+    editAble: true,
+    deleteAble: true,
+    plusAble: true,
+    titleCenter: false,
+  },
+};
