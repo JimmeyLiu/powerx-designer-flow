@@ -64,7 +64,7 @@
 /*节点的最外层容器*/
 .ef-node-container {
     position: absolute;
-    display: flex;
+    /* display: flex; */
     width: 170px;
     height: 32px;
     border: 1px solid #E0E3E7;

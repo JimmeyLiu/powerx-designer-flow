@@ -1,3 +1,5 @@
+//https://wdd.js.org/jsplumb-chinese-tutorial/#/?id=_212-%e8%8a%82%e7%82%b9%e7%bd%91%e6%a0%bc%e5%af%b9%e9%bd%90
+
 export const easyFlowMixin = {
   data() {
     return {
@@ -105,7 +107,7 @@ export const easyFlowMixin = {
         HoverPaintStyle: { stroke: "#b0b2b5", strokeWidth: 1 },
         // 滑过锚点效果
         // EndpointHoverStyle: {fill: 'red'}
-        Scope: "jsPlumb_DefaultScope", // 范围，具有相同scope的点才可连接
+        // Scope: "jsPlumb_DefaultScope", // 范围，具有相同scope的点才可连接
       },
       /**
        * 连线参数
@@ -130,12 +132,12 @@ export const easyFlowMixin = {
        */
       jsplumbSourceOptions: {
         // 设置可以拖拽的类名，只要鼠标移动到该类名上的DOM，就可以拖拽连线
-        filter: ".flow-node-drag",
-        filterExclude: false,
+        // filter: ".flow-node-drag",
+        // filterExclude: true,
         anchor: "Continuous",
         // 是否允许自己连接自己
-        allowLoopback: true,
-        maxConnections: -1,
+        allowLoopback: false,
+        maxConnections: 1,
         onMaxConnections: function (info) {
           console.log(`超过了最大值连线: ${info.maxConnections}`);
         },
@@ -167,8 +169,12 @@ export const easyFlowMixin = {
         filterExclude: false,
         // 是否允许自己连接自己
         anchor: "Continuous",
-        allowLoopback: true,
+        allowLoopback: false,
+        maxConnections: 1,
         dropOptions: { hoverClass: "ef-drop-hover" },
+        onMaxConnections: function (info) {
+          console.log(`超过了最大值连线: ${info.maxConnections}`);
+        },
       },
     };
   },

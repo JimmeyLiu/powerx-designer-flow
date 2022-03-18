@@ -11,74 +11,140 @@
 			<template #renderItem="{ item }">
 				<a-list-item>
 					<!-- <a-card :title="item.title">Card content</a-card> -->
-					<div class="component-item" x-component="EntityFormItem">
-						{{ item.title }}
-					</div>
+					<draggable
+						@end="end"
+						@start="start"
+						:options="draggableOptions"
+						:move="checkMove"
+					>
+						<div
+							class="node-item"
+							:ntype="item.type"
+							:name="item.name"
+						>
+							<DownloadOutlined v-if="item.type === 'input'" />
+							<UploadOutlined
+								v-else-if="item.type === 'output'"
+							/>
+							<ForkOutlined
+								v-else-if="item.type === 'joinGateway'"
+							/>
+							<BranchesOutlined
+								v-else-if="item.type === 'forkGateway'"
+							/>
+							<DatabaseOutlined
+								v-else-if="item.type === 'database'"
+							/>
+							<SendOutlined v-else-if="item.type === 'message'" />
+							<FunctionOutlined v-else />
+							{{ item.name }}
+						</div>
+					</draggable>
 				</a-list-item>
 			</template>
 		</a-list>
 	</div>
 </template>
 <script>
-import { defineComponent } from "vue";
-import $ from "jquery";
-import "jquery-ui/ui/widgets/draggable";
+import { defineComponent, ref } from "vue";
+// import $ from "jquery";
+// import "jquery-ui/ui/widgets/draggable";
+import { VueDraggableNext } from "vue-draggable-next";
+import { nodes } from "../core/nodes";
+import {
+	ForkOutlined,
+	DownloadOutlined,
+	UploadOutlined,
+	BranchesOutlined,
+	FunctionOutlined,
+	DatabaseOutlined,
+	SendOutlined,
+} from "@ant-design/icons-vue";
 
-const data = [
-	{
-		title: "Title 1",
-	},
-	{
-		title: "Title 2",
-	},
-	{
-		title: "Title 3",
-	},
-	{
-		title: "Title 4",
-	},
-	{
-		title: "Title 5",
-	},
-	{
-		title: "Title 6",
-	},
-];
+var mousePosition = {
+	left: -1,
+	top: -1,
+};
 export default defineComponent({
+	components: {
+		draggable: VueDraggableNext,
+		ForkOutlined,
+		DownloadOutlined,
+		UploadOutlined,
+		BranchesOutlined,
+		FunctionOutlined,
+		DatabaseOutlined,
+		SendOutlined,
+	},
 	setup() {
 		return {
-			data,
+			data: nodes,
+			nodeType: ref(""),
+			draggableOptions: ref({
+				preventOnFilter: false,
+				sort: false,
+				disabled: false,
+				ghostClass: "tt",
+				// 不使用H5原生的配置
+				forceFallback: true,
+				fallbackClass: "draggingStyle",
+				// 拖拽的时候样式
+				// fallbackClass: 'flow-node-draggable'
+			}),
 		};
 	},
-	mounted() {
-		$(".component-item").draggable({
-			helper: "clone",
-			scroll: true,
-			cursor: "move",
-			start: function () {
-				console.log("start");
-			},
-			stop: function () {},
-		});
-	},
 
-	methods: {},
+	created() {
+		/**
+		 * 以下是为了解决在火狐浏览器上推拽时弹出tab页到搜索问题
+		 * @param event
+		 */
+		if (this.isFirefox()) {
+			document.body.ondrop = function (event) {
+				// 解决火狐浏览器无法获取鼠标拖拽结束的坐标问题
+				mousePosition.left = event.layerX;
+				mousePosition.top = event.clientY - 50;
+				event.preventDefault();
+				event.stopPropagation();
+			};
+		}
+	},
+	methods: {
+		end(event) {
+			let type = event.item.getAttribute("ntype");
+			let name = event.item.getAttribute("name");
+			this.$emit("addNode", event, { type, name });
+		},
+		start(evt) {
+			console.log(evt);
+			this.nodeType = "service";
+		},
+		isFirefox() {
+			var userAgent = navigator.userAgent;
+			if (userAgent.indexOf("Firefox") > -1) {
+				return true;
+			}
+			return false;
+		},
+		checkMove(e) {
+			console.log(e);
+		},
+	},
 });
 </script>
 <style>
-.component-item {
-	height: 36px;
-	line-height: 36px;
-	justify-content: center;
-	width: 110px;
+.node-item {
+	height: 32px;
+	line-height: 32px;
+	width: 100px;
 	padding-left: 8px;
 	margin: 0 4px;
 	background: #fff;
-	border: 1px solid #e5e6e8;
+	border: 1px dashed #e5e6e8;
 	border-radius: 6px;
 	background-color: #fff;
 }
-.component-item:hover {
+.node-item:hover {
 	cursor: pointer;
 }
 .node-panel {
