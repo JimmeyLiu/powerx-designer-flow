@@ -145,7 +145,7 @@ export default {
 				: ["node-box-title", "node-box-title-left"];
 		},
 	},
-	emits: ["clickNode", "addForkNode"],
+	emits: ["clickNode", "addForkNode", "unlockNode", "deleteNode"],
 	methods: {
 		// 点击节点
 		clickNode() {
@@ -203,6 +203,7 @@ export default {
 	position: absolute;
 	border: 1px solid #e0e3e7;
 	background-color: #fff;
+	user-select: none;
 }
 
 .node-input,

@@ -51,6 +51,7 @@ export default defineComponent({
 		if (data) {
 			this.flowData = JSON.parse(data);
 		}
+		console.log(this.flowData);
 	},
 	methods: {
 		saveData() {

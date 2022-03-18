@@ -127,19 +127,18 @@ export default defineComponent({
 			return map;
 		},
 	},
+
 	mounted() {
-		this.data = this.flowData;
 		this.jsPlumb = jsPlumb.getInstance();
-		// this.bindDropEvent();
 		this.$nextTick(() => {
+			this.data = lodash.cloneDeep(this.flowData);
 			// 默认加载流程A的数据、在这里可以根据具体的业务返回符合流程数据格式的数据即可
-			this.dataReload(this.flowData);
+			this.$nextTick(() => {
+				this.jsPlumbInit();
+			});
 		});
 	},
 	methods: {
-		// initFlow() {
-
-		// },
 		jsPlumbInit() {
 			this.jsPlumb.ready(() => {
 				// 导入默认配置
@@ -270,23 +269,6 @@ export default defineComponent({
 		},
 		addForkNode(e) {
 			console.log(e);
-		},
-		dataReload(data) {
-			this.easyFlowVisible = false;
-			this.data.nodes = [];
-			this.data.lines = [];
-			this.$nextTick(() => {
-				data = lodash.cloneDeep(data);
-				this.easyFlowVisible = true;
-				this.data = data;
-				this.$nextTick(() => {
-					this.jsPlumb = jsPlumb.getInstance();
-
-					this.$nextTick(() => {
-						this.jsPlumbInit();
-					});
-				});
-			});
 		},
 
 		insertPlaceholder(conn, event) {
