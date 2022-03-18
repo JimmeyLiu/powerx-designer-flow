@@ -20,14 +20,12 @@
 			<flow-designer ref="flowDesigner" :flowData="flowData" />
 		</a-layout-content>
 	</a-layout>
-	
 </template>
 
 <script>
 import { defineComponent, ref } from "vue";
 
 import FlowDesigner from "./components/FlowDesigner.vue";
-import { getData } from "./sample/data";
 export default defineComponent({
 	name: "App",
 	components: {
@@ -35,15 +33,24 @@ export default defineComponent({
 	},
 	setup() {
 		return {
-			flowData: ref({}),
+			flowData: ref({
+				nodes: [
+					{
+						id: "input",
+						name: "输入",
+						type: "input",
+						left: "400px",
+						top: "30px",
+					},
+				],
+				edges: [],
+			}),
 		};
 	},
 	mounted() {
 		let data = localStorage.getItem("flowData");
 		if (data) {
 			this.flowData = JSON.parse(data);
-		} else {
-			this.flowData = getData();
 		}
 	},
 	methods: {
@@ -53,9 +60,6 @@ export default defineComponent({
 				JSON.stringify(this.$refs.flowDesigner.getFlowData())
 			);
 			this.$message.success("保存成功");
-		},
-		getFlowData() {
-			return getData();
 		},
 	},
 });
